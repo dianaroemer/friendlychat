@@ -125,30 +125,32 @@ function loadMessages() {
 async function saveImageMessage(file) {
   // TODO 9: Posts a new image as a message.
   try {
-    // 1 - We add a message with a loading icon that will get updated with the shared image
+    // 1 - We add a message with a loading icon that will get updated with the shared image.
     const messageRef = await addDoc(collection(getFirestore(), 'messages'), {
       name: getUserName(),
       imageUrl: LOADING_IMAGE_URL,
       profilePicUrl: getProfilePicUrl(),
-      timestamp: serverTimestamp(),
+      timestamp: serverTimestamp()
     });
 
-    // 2 - Upload the image to Cloud Storage
-    const filePath = 
-      `${getAuth().currentUser.uid}/${messageRef.id}/${file.name}`;
+    // 2 - Upload the image to Cloud Storage.
+    const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${file.name}`;
+    console.log('here0')
     const newImageRef = ref(getStorage(), filePath);
+    console.log('here1', newImageRef)
     const fileSnapshot = await uploadBytesResumable(newImageRef, file);
-
-    // 3 - Generate a public URL for the file
+    console.log('here2')    
+    // 3 - Generate a public URL for the file.
     const publicImageUrl = await getDownloadURL(newImageRef);
 
-    // 4 - Update the chat message placeholder with the image's URL
-    await updateDoc(messageRef, {
-      imageURL: publicImageUrl,
+    // 4 - Update the chat message placeholder with the image's URL.
+    console.log('here3')
+    await updateDoc(messageRef,{
+      imageUrl: publicImageUrl,
       storageUri: fileSnapshot.metadata.fullPath
     });
   } catch (error) {
-    console.log('There was an error uploading a file to Cloud Storage:', error);
+    console.error('There was an error uploading a file to Cloud Storage:', error);
   }
 }
 
